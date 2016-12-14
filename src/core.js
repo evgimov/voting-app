@@ -2,6 +2,7 @@ import {List, Map} from 'immutable';
 
 export const INITIAL_STATE = Map();
 
+//returns new list of entries
 export function setEntries(state, entries){
   return state.set('entries', List(entries));
 }
@@ -15,7 +16,7 @@ function getWinners(vote) {
   else if (aVotes < bVotes)  return [b];
   else                       return [a, b];
 }
-
+// get next pair of entries
 export function next(state) {
   const entries = state.get('entries')
     .concat(getWinners(state.get('vote')));
@@ -25,17 +26,21 @@ export function next(state) {
       .set('winner', entries.first());
   } else {
     return state.merge({
-      vote: Map({pair: entries.take(2)}),
-      entries: entries.skip(2)
+      vote: Map({pair: entries.take(2)}), //returns the first 2 entries from entries map
+      entries: entries.skip(2)  // returns the entries excluding first 2
     });
   }
 }
 
 export function vote(voteState, entry) {
-  return voteState.updateIn(
-    ['tally', entry],
-    0,
-    tally => tally + 1
-  );
+  if (voteState.get('pair').includes(entry)){
+    return voteState.updateIn(
+      ['tally', entry],
+      0,
+      tally => tally + 1
+    );
+  }else{
+    return voteState;
+  }
 }
 
